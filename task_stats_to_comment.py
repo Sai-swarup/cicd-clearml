@@ -65,30 +65,30 @@ def get_task_stats(task):
         return f"Task is in {task_status} status, this should not happen!"
 
 
-# def get_clearml_task_of_current_commit(commit_id):
-#     """Find the ClearML task that correspond to the exact codebase in the commit ID."""
-#     # Get the ID and Diff of all tasks based on the current commit hash, order by newest
-#     tasks = Task.query_tasks(
-#         task_filter={
-#             'order_by': ['-last_update'],
-#             '_all_': dict(fields=['script.version_num'],
-#                           pattern=commit_id
-#                           ),
-#             'status': ['completed']
-#         },
-#         additional_return_fields=['script.diff']
-#     )
+def get_clearml_task_of_current_commit(commit_id):
+    """Find the ClearML task that correspond to the exact codebase in the commit ID."""
+    # Get the ID and Diff of all tasks based on the current commit hash, order by newest
+    tasks = Task.query_tasks(
+        task_filter={
+            'order_by': ['-last_update'],
+            '_all_': dict(fields=['script.version_num'],
+                          pattern=commit_id
+                          ),
+            'status': ['completed']
+        },
+        additional_return_fields=['script.diff']
+    )
 
-#     # If there are tasks, check which one has no diff: aka which one was run with the exact
-#     # code that is staged in this PR.
-#     if tasks:
-#         for task in tasks:
-#             if not task['script.diff']:
-#                 return Task.get_task(task_id=task['id'])
+    # If there are tasks, check which one has no diff: aka which one was run with the exact
+    # code that is staged in this PR.
+    if tasks:
+        for task in tasks:
+            if not task['script.diff']:
+                return Task.get_task(task_id=task['id'])
 
-#     # If no task was run yet with the exact PR code, raise an error and block the PR.
-#     raise ValueError("No task based on this code was found in ClearML."
-#                      "Make sure to run it at least once before merging.")
+    # If no task was run yet with the exact PR code, raise an error and block the PR.
+    raise ValueError("No task based on this code was found in ClearML."
+                     "Make sure to run it at least once before merging.")
 
 
 if __name__ == '__main__':
